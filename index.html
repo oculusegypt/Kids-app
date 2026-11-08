@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#fff9ed" />
+    <meta
+      name="description"
+      content="رحلة سارة التعليمية — أنشطة تفاعلية ممتعة للأطفال"
+    />
+    <title>رحلة سارة التعليمية</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <button class="brand" type="button" data-screen="home" aria-label="الرئيسية">
+          <img src="./Untitled%20(5)/Brand%20mark.png" alt="" />
+          <span>
+            <strong>رحلة سارة</strong>
+            <small>نتعلّم ونلعب</small>
+          </span>
+        </button>
+        <div class="topbar-actions">
+          <button class="icon-button notification-button" type="button" aria-label="الإشعارات">
+            ♡
+            <span class="notification-dot"></span>
+          </button>
+          <button class="profile-button" type="button" data-screen="profile" aria-label="الملف الشخصي">
+            <img src="./Untitled%20(5)/Profile%20avatar.png" alt="" />
+          </button>
+        </div>
+      </header>
+
+      <main id="app" class="main-content" tabindex="-1"></main>
+
+      <nav class="bottom-nav" aria-label="التنقل الرئيسي">
+        <button class="nav-item is-active" type="button" data-screen="home">
+          <span aria-hidden="true">⌂</span><small>الرئيسية</small>
+        </button>
+        <button class="nav-item" type="button" data-screen="library">
+          <span aria-hidden="true">▤</span><small>التعلّم</small>
+        </button>
+        <button class="nav-item nav-create" type="button" data-screen="coloring">
+          <span aria-hidden="true">✎</span><small>ألوان</small>
+        </button>
+        <button class="nav-item" type="button" data-screen="achievements">
+          <span aria-hidden="true">☆</span><small>إنجازاتي</small>
+        </button>
+        <button class="nav-item" type="button" data-screen="profile">
+          <span aria-hidden="true">☺</span><small>ملفي</small>
+        </button>
+      </nav>
+    </div>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>
