@@ -136,8 +136,31 @@ function escapeHTML(value) {
 
 function updateNavigation() {
   document.querySelectorAll(".nav-item").forEach((item) => {
-    const isActive = item.dataset.screen === state.screen ||
-      (state.screen === "activity" && item.dataset.screen === "library");
+    const activeScreen = state.useReferenceScreens
+      ? ({
+        letterBook: "books",
+        reader: "books",
+        stories: "books",
+        math: "games",
+        mathGames: "games",
+        mathCatalog: "games",
+        mathExercise: "games",
+        numbers: "games",
+        counting: "games",
+        patterns: "games",
+        patternExercise: "games",
+        shapePatterns: "games",
+        language: "games",
+        words: "games",
+        puzzles: "games",
+        coloringIntro: "games",
+        coloringCanvas: "games",
+        reports: "achievements",
+      })[state.referenceScreen] || state.referenceScreen
+      : state.screen;
+    const navScreen = item.dataset.referenceScreen || item.dataset.screen;
+    const isActive = navScreen === activeScreen ||
+      ((state.screen === "activity" || state.screen === "coloring") && navScreen === "games");
     item.classList.toggle("is-active", isActive);
     if (isActive) item.setAttribute("aria-current", "page");
     else item.removeAttribute("aria-current");
@@ -153,7 +176,6 @@ function showToast(message) {
 
 function setScreen(screen) {
   state.useReferenceScreens = false;
-  document.body.classList.remove("reference-mode");
   state.screen = screen;
   updateNavigation();
   render();
@@ -168,7 +190,6 @@ function setReferenceScreen(screen, updateHistory = true) {
   }
   state.useReferenceScreens = true;
   state.referenceScreen = screen;
-  document.body.classList.add("reference-mode");
   updateNavigation();
   render();
   if (updateHistory) history.pushState({ screen }, "", `#${screen}`);
@@ -183,50 +204,46 @@ function renderHeading(title, subtitle, action = "") {
   </div>`;
 }
 
-function categoryCards() {
-  const categories = [
-    { id: "letters", title: "عالم الحروف", caption: "نتعلّم حرفًا جديدًا", image: "Illustrated letter and subject.png" },
-    { id: "counting", title: "الأرقام والعدّ", caption: "نعدّ ونكتشف", image: "Girl counting with her fingers.png" },
-    { id: "patterns", title: "فكّر واكتشف", caption: "أنماط وألغاز ممتعة", image: "Pattern exercise.png" },
-    { id: "coloring", title: "مرسم سارة", caption: "وقت الفن والألوان", image: "Paintbrush illustration.png" },
-  ];
-  return categories.map((item) => `<button class="category-card" type="button" data-action="category" data-category="${item.id}">
-    <img src="${asset(item.image)}" alt="" loading="lazy" />
-    <strong>${item.title}</strong><small>${item.caption}</small>
-  </button>`).join("");
-}
-
 function renderHome() {
+  const categories = [
+    { screen: "letterBook", title: "الحروف والقراءة", symbol: "أ", tone: "mint" },
+    { screen: "numbers", title: "الأرقام والعدّ", symbol: "٣", tone: "gold" },
+    { screen: "patterns", title: "الأنماط والأشكال", symbol: "◇", tone: "lavender" },
+    { screen: "stories", title: "حكايات سارة", symbol: "ق", tone: "rose" },
+  ];
   const learned = Math.min(28, progress.completed);
-  return `${`<section class="hero">
-      <div class="hero-copy">
-        <p class="eyebrow">أهلًا يا سارة! ✨</p>
-        <h1>مستعدة لمغامرة<br />جديدة اليوم؟</h1>
-        <p>كل يوم فرصة نتعلّم فيها شيئًا جديدًا، خطوة صغيرة تصنع فرقًا كبيرًا.</p>
-        <button class="button gold" type="button" data-action="start">هيا نبدأ <span aria-hidden="true">←</span></button>
+  return `<section class="home-welcome">
+      <div class="home-welcome-copy">
+        <p class="eyebrow">أهلاً يا بطل!</p>
+        <h1>ماذا سنتعلم اليوم؟</h1>
       </div>
-      <img class="hero-art" src="${asset("Learning character.png")}" alt="سارة مستعدة للتعلّم" />
     </section>
+    <button class="next-class-card" type="button" data-reference-screen="math" aria-label="افتحي حصتي القادمة">
+      <span class="next-class-icon"><img src="${asset("Book icon.png")}" alt="" /></span>
+      <span class="next-class-copy"><strong>حصتي القادمة</strong><small>مستعدة لدرس جديد؟</small></span>
+      <span class="next-class-arrow" aria-hidden="true">←</span>
+    </button>
     <section class="home-stats" aria-label="تقدّمك">
-      <div class="stat-card"><span class="stat-icon" aria-hidden="true">⭐</span><div><strong>${progress.stars}</strong><small>نجمة جمعتِها</small></div></div>
-      <div class="stat-card"><span class="stat-icon" aria-hidden="true">📚</span><div><strong>${learned}</strong><small>نشاطًا مكتملًا</small></div></div>
-      <div class="stat-card"><span class="stat-icon" aria-hidden="true">🔥</span><div><strong>${progress.currentStreak}</strong><small>أيام من التعلّم</small></div></div>
+      <div class="stat-card"><span class="stat-icon" aria-hidden="true">⭐</span><div><strong>${progress.stars}</strong><small>نجومي</small></div></div>
+      <div class="stat-card"><span class="stat-icon" aria-hidden="true">📚</span><div><strong>${learned}</strong><small>أنشطة مكتملة</small></div></div>
+      <div class="stat-card"><span class="stat-icon" aria-hidden="true">🔥</span><div><strong>${progress.currentStreak}</strong><small>أيام التعلّم</small></div></div>
     </section>
-    <section class="section">
-      <div class="section-title"><h2>اختاري مغامرتك</h2><button class="text-button" type="button" data-screen="library">كل الأنشطة ←</button></div>
-      <div class="category-grid">${categoryCards()}</div>
+    <section class="section home-learning-section">
+      <div class="section-title"><h2>اختاري نشاطاً</h2><button class="text-button" type="button" data-reference-screen="games">كل الأنشطة ←</button></div>
+      <div class="home-learning-grid">${categories.map((category) => `<button class="home-learning-card ${category.tone}" type="button" data-reference-screen="${category.screen}">
+        <span class="home-learning-art" aria-hidden="true">${category.symbol}</span>
+        <span class="home-learning-title">${category.title}</span>
+        <span class="home-learning-arrow" aria-hidden="true">←</span>
+      </button>`).join("")}</div>
     </section>
-    <section class="section">
-      <div class="section-title"><h2>حروفنا الجميلة</h2><button class="text-button" type="button" data-action="category" data-category="letters">تدرّبي عليها ←</button></div>
-      <div class="letter-strip">${letters.slice(0, 14).map(([letter, word, image]) => `<button class="letter-tile" type="button" data-action="speak" data-word="${word}" aria-label="استمع إلى حرف ${letter}"><span>${letter}</span><small>${word}</small></button>`).join("")}</div>
-    </section>
-    <section class="section">
-      <div class="section-title"><h2>رحلتك مستمرة</h2><button class="text-button" type="button" data-screen="achievements">إنجازاتي ←</button></div>
-      <div class="screen-card">
-        <div class="progress-label"><span>خطواتك نحو اكتشاف الحروف</span><strong>${learned} / 28</strong></div>
-        <div class="progress-track"><div class="progress-fill" style="width:${Math.min(100, (learned / 28) * 100)}%"></div></div>
-      </div>
-    </section>`}`;
+    <section class="section home-achievement-preview">
+      <div class="section-title"><h2>إنجازاتي</h2><button class="text-button" type="button" data-reference-screen="achievements">عرض الكل ←</button></div>
+      <button class="achievement-teaser" type="button" data-reference-screen="achievements">
+        <img src="${asset("Achievements trophy.png")}" alt="" />
+        <span><strong>كل خطوة إنجاز جديد</strong><small>${progress.stars} نجمة جمعتِها حتى الآن</small></span>
+        <span aria-hidden="true">←</span>
+      </button>
+    </section>`;
 }
 
 function renderLibrary() {
@@ -361,7 +378,9 @@ function renderProfile() {
 
 function render() {
   if (state.useReferenceScreens) {
-    renderReferenceScreen();
+    app.innerHTML = state.referenceScreen === "home"
+      ? renderHome()
+      : renderPlannedScreen(state.referenceScreen);
     return;
   }
   const pages = {
@@ -376,37 +395,25 @@ function render() {
   if (state.screen === "coloring") setupCanvas();
 }
 
-function renderReferenceScreen() {
-  const screen = screenReferenceMap[state.referenceScreen];
+function renderPlannedScreen(screenId) {
+  const screen = screenReferenceMap[screenId];
   if (!screen) {
-    console.error(`Could not render reference screen: ${state.referenceScreen}`);
-    app.replaceChildren();
-    return;
+    console.error(`Could not render planned screen: ${screenId}`);
+    return `<section class="planned-screen"><h1>الشاشة غير موجودة</h1></section>`;
   }
-
   const screenName = escapeHTML(screen.title);
-  const imagePath = `./الشاشات/${encodeURIComponent(screen.image)}`;
-  const hotspots = screen.hotspots.map((hotspot) => {
+  const links = screen.hotspots.map((hotspot) => {
     const targetAttribute = hotspot.screen
       ? `data-reference-screen="${escapeHTML(hotspot.screen)}"`
       : `data-reference-action="${escapeHTML(hotspot.action)}"`;
-    const position = `left:${hotspot.x * 100}%;top:${hotspot.y * 100}%;width:${hotspot.width * 100}%;height:${hotspot.height * 100}%`;
-    return `<button class="screen-hotspot" type="button" ${targetAttribute} style="${position}" aria-label="${escapeHTML(hotspot.label)}"></button>`;
+    return `<button class="planned-link" type="button" ${targetAttribute}>${escapeHTML(hotspot.label)} <span aria-hidden="true">←</span></button>`;
   });
-
-  if (screen.parent) {
-    hotspots.push(`<button class="screen-hotspot screen-back-hotspot" type="button" data-reference-screen="${escapeHTML(screen.parent)}" style="left:84%;top:1%;width:15%;height:7%" aria-label="رجوع إلى ${escapeHTML(screenReferenceMap[screen.parent].title)}"></button>`);
-  }
-
-  if (screen.showTabs !== false) {
-    referenceNavigation.forEach((item) => {
-      hotspots.push(`<button class="screen-hotspot" type="button" data-reference-screen="${item.screen}" style="left:${item.x * 100}%;top:92%;width:${item.width * 100}%;height:8%" aria-label="${item.label}"></button>`);
-    });
-  }
-
-  app.innerHTML = `<section class="reference-stage" aria-label="${screenName}">
-    <img class="reference-image" src="${imagePath}" alt="الشاشة المرجعية: ${screenName}" draggable="false" />
-    <div class="reference-hotspots">${hotspots.join("")}</div>
+  return `<section class="planned-screen" aria-label="${screenName}">
+    <p class="eyebrow">خريطة التطبيق</p>
+    <h1>${screenName}</h1>
+    <p class="planned-screen-note">هذه الشاشة قيد التركيب من عناصرها المنفصلة. لن نعرض صورة الشاشة المجمّعة بدل الواجهة.</p>
+    ${screen.parent ? `<button class="button secondary" type="button" data-reference-screen="${escapeHTML(screen.parent)}">→ رجوع إلى ${escapeHTML(screenReferenceMap[screen.parent].title)}</button>` : ""}
+    ${links.length ? `<div class="planned-links"><h2>الفروع المتاحة</h2>${links.join("")}</div>` : ""}
   </section>`;
 }
 
@@ -634,6 +641,5 @@ if (Object.hasOwn(screenReferenceMap, initialScreen)) {
   history.replaceState({ screen: "home" }, "", "#home");
 }
 
-document.body.classList.add("reference-mode");
 render();
 updateNavigation();

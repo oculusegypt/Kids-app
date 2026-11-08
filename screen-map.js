@@ -241,10 +241,3 @@ const screenReferenceMap = {
     ],
   },
 };
-
-const referenceNavigation = [
-  { screen: "achievements", label: "إنجازاتي", x: 0, width: 0.25 },
-  { screen: "games", label: "أنشطتي", x: 0.25, width: 0.25 },
-  { screen: "books", label: "كتبي", x: 0.5, width: 0.25 },
-  { screen: "home", label: "الرئيسية", x: 0.75, width: 0.25 },
-];

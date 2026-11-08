@@ -16,19 +16,16 @@
   <body>
     <div class="app-shell">
       <header class="topbar">
-        <button class="brand" type="button" data-screen="home" aria-label="الرئيسية">
+        <button class="brand" type="button" data-reference-screen="home" aria-label="الرئيسية">
           <img src="./Untitled%20(5)/Brand%20mark.png" alt="" />
-          <span>
-            <strong>رحلة سارة</strong>
-            <small>نتعلّم ونلعب</small>
-          </span>
+          <img class="brand-name" src="./Untitled%20(5)/Brand%20name.png" alt="رحلة سارة التعليمية" />
         </button>
         <div class="topbar-actions">
           <button class="icon-button notification-button" type="button" aria-label="الإشعارات">
             ♡
             <span class="notification-dot"></span>
           </button>
-          <button class="profile-button" type="button" data-screen="profile" aria-label="الملف الشخصي">
+          <button class="profile-button" type="button" data-reference-screen="profile" aria-label="الملف الشخصي">
             <img src="./Untitled%20(5)/Profile%20avatar.png" alt="" />
           </button>
         </div>
@@ -37,20 +34,17 @@
       <main id="app" class="main-content" tabindex="-1"></main>
 
       <nav class="bottom-nav" aria-label="التنقل الرئيسي">
-        <button class="nav-item is-active" type="button" data-screen="home">
-          <span aria-hidden="true">⌂</span><small>الرئيسية</small>
+        <button class="nav-item is-active" type="button" data-reference-screen="home">
+          <img src="./Untitled%20(5)/Home%20icon.png" alt="" /><small>الرئيسية</small>
         </button>
-        <button class="nav-item" type="button" data-screen="library">
-          <span aria-hidden="true">▤</span><small>التعلّم</small>
+        <button class="nav-item" type="button" data-reference-screen="books">
+          <img src="./Untitled%20(5)/Book%20icon.png" alt="" /><small>كتبي</small>
         </button>
-        <button class="nav-item nav-create" type="button" data-screen="coloring">
-          <span aria-hidden="true">✎</span><small>ألوان</small>
+        <button class="nav-item" type="button" data-reference-screen="games">
+          <img src="./Untitled%20(5)/Activities%20star.png" alt="" /><small>أنشطتي</small>
         </button>
-        <button class="nav-item" type="button" data-screen="achievements">
-          <span aria-hidden="true">☆</span><small>إنجازاتي</small>
-        </button>
-        <button class="nav-item" type="button" data-screen="profile">
-          <span aria-hidden="true">☺</span><small>ملفي</small>
+        <button class="nav-item" type="button" data-reference-screen="achievements">
+          <img src="./Untitled%20(5)/Achievements%20trophy.png" alt="" /><small>إنجازاتي</small>
         </button>
       </nav>
     </div>
