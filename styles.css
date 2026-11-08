@@ -1066,9 +1066,82 @@ h3 {
   text-align: center;
 }
 
+body.reference-mode {
+  min-width: 320px;
+  background: #e9e6de;
+}
+
+body.reference-mode .app-shell {
+  width: min(100%, 426px);
+  min-height: 100vh;
+  padding: 0;
+  background: #fff;
+  box-shadow: 0 0 45px rgb(34 45 39 / 16%);
+}
+
+body.reference-mode .topbar,
+body.reference-mode .bottom-nav {
+  display: none;
+}
+
+body.reference-mode .main-content {
+  min-height: 0;
+  padding: 0;
+}
+
+body.reference-mode .toast {
+  bottom: 20px;
+}
+
+.reference-stage {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: #fff;
+  line-height: 0;
+}
+
+.reference-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+}
+
+.reference-hotspots {
+  position: absolute;
+  inset: 0;
+}
+
+.screen-hotspot {
+  position: absolute;
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.screen-hotspot:hover {
+  background: rgb(255 255 255 / 5%);
+}
+
+.screen-hotspot:focus-visible {
+  z-index: 1;
+  outline: 3px solid #e8ad41;
+  outline-offset: -4px;
+  background: rgb(255 255 255 / 10%);
+}
+
 @media (max-width: 760px) {
   .app-shell {
     padding: 0 20px 103px;
+  }
+
+  body.reference-mode .app-shell {
+    padding: 0;
   }
 
   .topbar {

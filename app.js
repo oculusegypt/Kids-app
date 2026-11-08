@@ -83,6 +83,8 @@ const filters = ["الكل", "اللغة", "الرياضيات", "التفكير
 const paletteColors = ["#e76f51", "#f2b544", "#6ea77a", "#63a6b1", "#8776b5", "#e68ba4", "#293f52", "#d9c9a4"];
 const state = {
   screen: "home",
+  referenceScreen: "home",
+  useReferenceScreens: true,
   category: "letters",
   questionIndex: 0,
   answered: false,
@@ -150,9 +152,26 @@ function showToast(message) {
 }
 
 function setScreen(screen) {
+  state.useReferenceScreens = false;
+  document.body.classList.remove("reference-mode");
   state.screen = screen;
   updateNavigation();
   render();
+  app.focus({ preventScroll: true });
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function setReferenceScreen(screen, updateHistory = true) {
+  if (!Object.hasOwn(screenReferenceMap, screen)) {
+    console.error(`Unknown reference screen: ${screen}`);
+    return;
+  }
+  state.useReferenceScreens = true;
+  state.referenceScreen = screen;
+  document.body.classList.add("reference-mode");
+  updateNavigation();
+  render();
+  if (updateHistory) history.pushState({ screen }, "", `#${screen}`);
   app.focus({ preventScroll: true });
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -341,6 +360,10 @@ function renderProfile() {
 }
 
 function render() {
+  if (state.useReferenceScreens) {
+    renderReferenceScreen();
+    return;
+  }
   const pages = {
     home: renderHome,
     library: renderLibrary,
@@ -351,6 +374,40 @@ function render() {
   };
   app.innerHTML = (pages[state.screen] || renderHome)();
   if (state.screen === "coloring") setupCanvas();
+}
+
+function renderReferenceScreen() {
+  const screen = screenReferenceMap[state.referenceScreen];
+  if (!screen) {
+    console.error(`Could not render reference screen: ${state.referenceScreen}`);
+    app.replaceChildren();
+    return;
+  }
+
+  const screenName = escapeHTML(screen.title);
+  const imagePath = `./الشاشات/${encodeURIComponent(screen.image)}`;
+  const hotspots = screen.hotspots.map((hotspot) => {
+    const targetAttribute = hotspot.screen
+      ? `data-reference-screen="${escapeHTML(hotspot.screen)}"`
+      : `data-reference-action="${escapeHTML(hotspot.action)}"`;
+    const position = `left:${hotspot.x * 100}%;top:${hotspot.y * 100}%;width:${hotspot.width * 100}%;height:${hotspot.height * 100}%`;
+    return `<button class="screen-hotspot" type="button" ${targetAttribute} style="${position}" aria-label="${escapeHTML(hotspot.label)}"></button>`;
+  });
+
+  if (screen.parent) {
+    hotspots.push(`<button class="screen-hotspot screen-back-hotspot" type="button" data-reference-screen="${escapeHTML(screen.parent)}" style="left:84%;top:1%;width:15%;height:7%" aria-label="رجوع إلى ${escapeHTML(screenReferenceMap[screen.parent].title)}"></button>`);
+  }
+
+  if (screen.showTabs !== false) {
+    referenceNavigation.forEach((item) => {
+      hotspots.push(`<button class="screen-hotspot" type="button" data-reference-screen="${item.screen}" style="left:${item.x * 100}%;top:92%;width:${item.width * 100}%;height:8%" aria-label="${item.label}"></button>`);
+    });
+  }
+
+  app.innerHTML = `<section class="reference-stage" aria-label="${screenName}">
+    <img class="reference-image" src="${imagePath}" alt="الشاشة المرجعية: ${screenName}" draggable="false" />
+    <div class="reference-hotspots">${hotspots.join("")}</div>
+  </section>`;
 }
 
 function handleAnswer(button) {
@@ -496,6 +553,25 @@ function setupCanvas() {
 }
 
 document.addEventListener("click", (event) => {
+  const referenceControl = event.target.closest("[data-reference-screen], [data-reference-action]");
+  if (referenceControl) {
+    if (referenceControl.dataset.referenceScreen) {
+      setReferenceScreen(referenceControl.dataset.referenceScreen);
+      return;
+    }
+    const actions = {
+      "live-coloring": "coloring",
+      "live-letters": "letters",
+      "live-counting": "counting",
+      "live-patterns": "patterns",
+      "live-puzzles": "puzzles",
+    };
+    const category = actions[referenceControl.dataset.referenceAction];
+    if (category === "coloring") setScreen("coloring");
+    else if (category) openCategory(category);
+    return;
+  }
+
   const control = event.target.closest("[data-screen], [data-action]");
   if (!control) return;
   if (control.dataset.screen) {
@@ -542,5 +618,22 @@ document.querySelector(".notification-button").addEventListener("click", () => {
   showToast("أحسنتِ! أنتِ تقومين بعمل رائع 🌟");
 });
 
+window.addEventListener("popstate", () => {
+  const screen = window.location.hash.slice(1);
+  if (Object.hasOwn(screenReferenceMap, screen)) {
+    setReferenceScreen(screen, false);
+  } else {
+    setReferenceScreen("home", false);
+  }
+});
+
+const initialScreen = window.location.hash.slice(1);
+if (Object.hasOwn(screenReferenceMap, initialScreen)) {
+  state.referenceScreen = initialScreen;
+} else {
+  history.replaceState({ screen: "home" }, "", "#home");
+}
+
+document.body.classList.add("reference-mode");
 render();
 updateNavigation();
